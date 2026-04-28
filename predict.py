@@ -6,13 +6,17 @@ MODEL_PATH = "spam_email_detector.pkl"
 
 def predict_email(email_text, model):
     prediction = model.predict([email_text])[0]
+    probability = model.predict_proba([email_text])[0]
+
+    not_spam_probability = probability[0] * 100
+    spam_probability = probability[1] * 100
 
     if prediction == 1:
         result = "Spam Email"
     else:
         result = "Not Spam / Ham Email"
 
-    return result
+    return result, spam_probability, not_spam_probability
 
 
 def main():
@@ -28,9 +32,11 @@ def main():
             print("Program closed.")
             break
 
-        result = predict_email(email_text, model)
+        result, spam_prob, ham_prob = predict_email(email_text, model)
 
-        print("\nPrediction:", result, "\n")
+        print("\nPrediction:", result)
+        print(f"Spam probability: {spam_prob:.2f}%")
+        print(f"Not spam probability: {ham_prob:.2f}%\n")
 
 
 if __name__ == "__main__":
