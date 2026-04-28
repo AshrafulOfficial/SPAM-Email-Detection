@@ -3,7 +3,7 @@ import joblib
 
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.naive_bayes import MultinomialNB
+from sklearn.svm import LinearSVC
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 
@@ -23,13 +23,13 @@ def main():
     print("\nLabel distribution:")
     print(df[LABEL_COL].value_counts())
 
-    # Keep required columns and remove missing values
+    # Clean dataset
     df = df[[TEXT_COL, LABEL_COL]].dropna()
 
     X = df[TEXT_COL].astype(str)
     y = df[LABEL_COL].astype(int)
 
-    # Split dataset into training and testing parts
+    # 80% training and 20% testing
     X_train, X_test, y_train, y_test = train_test_split(
         X,
         y,
@@ -38,14 +38,15 @@ def main():
         stratify=y
     )
 
-    # Machine learning pipeline
+    # Improved model
     model = Pipeline([
         ("tfidf", TfidfVectorizer(
             stop_words="english",
             lowercase=True,
-            max_features=5000
+            max_features=10000,
+            ngram_range=(1, 2)
         )),
-        ("classifier", MultinomialNB())
+        ("classifier", LinearSVC())
     ])
 
     # Train model
@@ -54,7 +55,9 @@ def main():
     # Test model
     y_pred = model.predict(X_test)
 
-    print("\nAccuracy:", accuracy_score(y_test, y_pred))
+    accuracy = accuracy_score(y_test, y_pred)
+
+    print("\nAccuracy:", accuracy)
 
     print("\nClassification Report:")
     print(classification_report(
@@ -66,10 +69,10 @@ def main():
     print("\nConfusion Matrix:")
     print(confusion_matrix(y_test, y_pred))
 
-    # Save trained model
+    # Save model
     joblib.dump(model, "spam_email_detector.pkl")
 
-    print("\nModel saved successfully as spam_email_detector.pkl")
+    print("\nImproved model saved successfully as spam_email_detector.pkl")
 
 
 if __name__ == "__main__":
