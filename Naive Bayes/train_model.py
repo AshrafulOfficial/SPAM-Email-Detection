@@ -10,7 +10,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 
 
-DATASET_PATH = "emails.csv"
+DATASET_PATH = "../emails.csv"
 TEXT_COL = "text"
 LABEL_COL = "spam"
 FIGURE_DIR = "figures"
